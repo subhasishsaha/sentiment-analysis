@@ -57,7 +57,7 @@ def load_resources():
             def forward(self, input_ids, attention_mask):
                 output = self.roberta(input_ids=input_ids, attention_mask=attention_mask)
                 pooled_output = output.last_hidden_state[:, 0, :]
-                output = self.drop(pooled_output)
+                output = self.drop(pooled_output )
                 output = self.out(output)
                 return output
     
