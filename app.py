@@ -272,8 +272,12 @@ def main():
 
     st.title("Play Store Review Analyzer 📱")
 
+    # --- FIX 1: Initialize session state for suggestions ---
+    # This ensures the key exists across all reruns.
     if 'review_df' not in st.session_state:
         st.session_state['review_df'] = pd.DataFrame()
+    if 'gemini_suggestions' not in st.session_state:
+        st.session_state['gemini_suggestions'] = None
 
     col1, col2 = st.columns([1, 2])
 
@@ -302,27 +306,35 @@ def main():
                     df_processed["content_processed"] = df_processed["content"].apply(preprocess)
                     df_processed.dropna(subset=['content_processed'], inplace=True)
                     
-                    # Filter for English content after initial preprocessing
                     if not df_processed.empty:
                         df_processed["content_processed"] = df_processed["content_processed"].apply(filter_english_sentences)
                         df_processed.dropna(subset=['content_processed'], inplace=True)
 
                     if df_processed.empty:
                         st.warning("No valid English content found after preprocessing.")
-                        st.session_state['review_df'] = pd.DataFrame() # Clear old results
+                        st.session_state['review_df'] = pd.DataFrame()
+                        # --- FIX 2: Clear previous suggestions on new analysis ---
+                        st.session_state['gemini_suggestions'] = None 
                         return
 
                     texts = df_processed["content_processed"].tolist()
                     df_processed["labels"] = get_labels_batch(texts)
                     df_processed["sentiment"] = predict_sentiments(texts)
                     
-                    # Merge results back to the original df to keep all columns
-                    # Use 'reviewId' as the key for a robust merge
                     df = df.merge(df_processed[['reviewId', 'sentiment', 'labels']], on='reviewId', how='right')
                     df.reset_index(drop=True, inplace=True)
                 
                 st.success("✅ Analysis Complete!")
                 st.session_state['review_df'] = df
+
+                # --- FIX 3: Generate and store suggestions only ONCE after analysis ---
+                with st.spinner("Generating suggestions..."):
+                    label_to_reviews = prepare_label_to_reviews(df)
+                    if label_to_reviews:
+                        st.session_state['gemini_suggestions'] = generate_gemini_suggestions(label_to_reviews)
+                    else:
+                        # Use an empty dictionary to show analysis ran but found nothing to suggest
+                        st.session_state['gemini_suggestions'] = {}
             
             except Exception as e:
                 st.error(f"An error occurred during analysis: {e}")
@@ -337,18 +349,16 @@ def main():
             st.markdown("---")
             
             st.subheader("💡 Gemini Suggestions (for Negative Reviews)")
-            with st.spinner("Generating suggestions..."):
-                label_to_reviews = prepare_label_to_reviews(df_display)
-                if label_to_reviews:
-                    suggestions = generate_gemini_suggestions(label_to_reviews)
-                    if suggestions:
-                        for label, suggestion in suggestions.items():
-                            with st.expander(f"Suggestions for: **{label.title()}**"):
-                                st.markdown(suggestion)
-                    else:
-                        st.info("Could not generate suggestions from the negative reviews.")
-                else:
-                    st.info("No actionable negative reviews found to generate suggestions.")
+            # --- FIX 4: Display suggestions from session state instead of regenerating ---
+            suggestions = st.session_state.get('gemini_suggestions')
+
+            if suggestions: # Checks if dict is not None and not empty
+                for label, suggestion in suggestions.items():
+                    with st.expander(f"Suggestions for: **{label.title()}**"):
+                        st.markdown(suggestion)
+            elif suggestions is not None: # This means suggestions were generated but were empty ({})
+                st.info("No actionable negative reviews found to generate suggestions.")
+
         else:
             st.info("⬅️ Enter an App ID and click 'Fetch & Analyze Reviews' to begin.")
 
