@@ -1,2 +1,4 @@
 .env
 Models/
+test.py
+update_local_model.py
