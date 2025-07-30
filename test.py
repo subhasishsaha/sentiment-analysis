@@ -31,7 +31,7 @@ GOOGLE_DRIVE_FILE_IDS = {
     "ensemble_model": "1ZWICtGgeyo4SOJGGzc7EYD4A7x-JKU60",
     "tfidf": "1_dJAeRBxgXWlkf66meNPxojd5filhT-E",
     "sentiment_model": "1QpyEew6f-mUuMpR9Wn0r1zeyCUgNiJ7Q",
-    "roberta_tokenizer_folder": "1Z2b9g0j3k8f4a5d6e7f8g9h0i1j2k3l4", # Placeholder ID
+    "roberta_tokenizer_folder": "1PGrAWzFC-E8MtBvgHI8eHxlov2oY_1zq", # Placeholder ID
     "roberta_base_folder": "15Y8C6hErEPnkU3zH8SVA0YYxCaSsN_Qd"      # Placeholder ID
 }
 
@@ -126,8 +126,14 @@ def filter_english_sentences(text):
     if not isinstance(text, str):
         return np.nan
     sentences = [s.strip() for s in text.split('.') if len(s.split()) > 1]
-    english_sentences = [s for s in sentences if s and detect(s) == 'en' rescue None]
-    return '. '.join(english_sentences) if english_sentences else np.nan
+    english = []
+    for s in sentences:
+        try:
+            if detect(s) == 'en':
+                english.append(s)
+        except LangDetectException:
+            continue
+    return '. '.join(english) if english else np.nan
 
 # === ML/AI Functions ===
 def get_labels_batch(texts):
