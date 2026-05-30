@@ -1,121 +1,344 @@
 # Play Store Review Analyzer
 
-An advanced NLP-powered application to scrape, analyze, and derive actionable insights from Google Play Store reviews. This tool utilizes an ensemble of Machine Learning models for classification, Deep Learning for sentiment analysis, and Generative AI (Google Gemini) for strategic recommendations.
+An end-to-end NLP and Generative AI platform for analyzing Google Play Store reviews at scale. The application collects app reviews, performs sentiment analysis, identifies issue categories through multi-label classification, and generates actionable improvement recommendations for developers using Google Gemini.
 
-## Features
+## Overview
 
+Understanding user feedback is critical for improving mobile applications. This project automates the review analysis process by combining:
 
-* **Real-time Scraping:** Fetch reviews dynamically from the Google Play Store using App IDs.
-* **Text Preprocessing:** Automated cleaning, emoji removal, and non-English sentence filtering.
-* **Sentiment Analysis:** Fine-tuned **RoBERTa** model to classify reviews as Positive or Negative.
-* **Multi-Label Classification:** Classifies reviews into specific categories (e.g., `Bugs`, `UI/UX`, `Ads`, `Cost`) using an **Ensemble Model** (Logistic Regression + XGBoost + Random Forest).
-* **GenAI Insights:** Uses **Google Gemini API** to generate actionable suggestions for developers based on negative feedback clusters.
-* **Interactive Visualizations:**
-    * Label & Sentiment distribution charts (Plotly).
-    * Category-specific sentiment breakdown.
-    * App Version sentiment tracking.
-    * Word Clouds.
+- Review scraping from Google Play Store
+- Advanced text preprocessing
+- Deep Learning-based sentiment analysis
+- Multi-label issue classification
+- Interactive visual analytics
+- AI-generated improvement recommendations
 
+The result is a dashboard that helps developers quickly identify recurring issues, monitor user sentiment, and prioritize product improvements.
 
+---
+
+## Key Features
+
+### Review Collection
+
+- Fetch reviews directly from Google Play Store using App IDs.
+- Support for configurable review counts.
+- Analyze reviews from any publicly available Android application.
+
+### Text Processing
+
+- URL and emoji removal.
+- Text normalization and cleaning.
+- Filtering of noisy review content.
+
+### Sentiment Analysis
+
+- Fine-tuned RoBERTa model.
+- Binary sentiment classification:
+  - Positive
+  - Negative
+
+### Multi-Label Issue Detection
+
+Classifies reviews into multiple categories simultaneously, such as:
+
+- Bugs
+- Performance
+- UI/UX
+- Ads
+- Cost
+- Features
+- Account Issues
+- Updates
+
+The classification pipeline uses an ensemble approach combining:
+
+- Logistic Regression
+- Random Forest
+- XGBoost
+
+### AI-Powered Recommendations
+
+Negative reviews are grouped by issue category and summarized using Google Gemini to generate:
+
+- Improvement suggestions
+- Product enhancement recommendations
+- Priority issue summaries
+
+### Interactive Visualizations
+
+- Sentiment distribution
+- Label distribution
+- Category-wise sentiment analysis
+- Version-wise sentiment tracking
+- Word clouds
+- Review exploration dashboard
+
+---
+
+## System Architecture
+
+```text
+Google Play Reviews
+         |
+         v
+  Text Preprocessing
+         |
+         +----------------+
+         |                |
+         v                v
+ Sentiment Model    Label Classifier
+   (RoBERTa)         (Ensemble ML)
+         |                |
+         +--------+-------+
+                  |
+                  v
+      Analytics & Insights
+                  |
+                  v
+     Gemini Recommendation Engine
+                  |
+                  v
+        Streamlit Dashboard
+```
+
+---
 
 ## Repository Structure
 
 ```text
+playstore-review-analyzer/
+│
 ├── Dataset/
-│   └── gpreviews_2.csv                  # Dataset used for training models
+│   └── gpreviews_2.csv
+│
 ├── Test Notebooks/
-│   ├── binary-sentiment-classification-using-roberta.ipynb  # RoBERTa training
-│   ├── initial-multi-labelling-using-bart-large.ipynb       # Zero-shot labeling
-│   ├── multi-label-classification-using-ensemble-approach.ipynb # Ensemble training
-│   └── suggestion-using-gemini.ipynb    # GenAI experimentation
-├── Models/                              # Directory for saved models 
-├── app.py                               # Main Streamlit Application
-├── LICENSE
-├── requirements.txt                     # Python dependencies
-└── update_local_model.py
+│   ├── binary-sentiment-classification-using-roberta.ipynb
+│   ├── initial-multi-labelling-using-bart-large.ipynb
+│   ├── multi-label-classification-using-ensemble-approach.ipynb
+│   └── suggestion-using-gemini.ipynb
+│
+├── Models/
+│   ├── sentiment_model/
+│   ├── roberta_tokenizer/
+│   └── ensemble_models/
+│
+├── app.py
+├── update_local_model.py
+├── requirements.txt
+└── README.md
 ```
+
+---
+
+## Technology Stack
+
+### Machine Learning
+
+- Scikit-learn
+- XGBoost
+- TF-IDF Vectorization
+
+### Deep Learning
+
+- PyTorch
+- RoBERTa
+- Transformers
+
+### Generative AI
+
+- Google Gemini
+
+### Data Collection
+
+- Google Play Scraper
+
+### Visualization
+
+- Plotly
+- WordCloud
+- Pandas
+
+### Application Framework
+
+- Streamlit
+
+---
+
 ## Installation
 
-- **Clone the Repository** 
-    ```
-    git clone https://github.com/subhasishsaha/sentiment-analysis.git
-    cd play-store-review-analyzer
-    ```
-- **Install Dependencies**
-    ```
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
-- **Setup Environment Variables**
+### Clone the Repository
 
-    Create a .env file in the root directory and add your Google Gemini API key.
-
-    ```
-    GEMINI_API_KEY=your_api_key_here
-    ```
-- **Generate/Download Models**
-
-    ***Note**: The repository now contains all the models required. You can use the models given, or run the notebook file to generate the models. You can execute the steps given below to generate the models.*
-
-    - **Labeling Model**: Run multi-label-classification-using-ensemble-approach.ipynb to generate:
-
-        - *multilabel_binarizer.pkl*
-
-        - *ensemble_model.pkl*
-
-        - *tfidf.pkl*
-
-        Place these in **Models/ensemble_models/**.
-    
-    - **Sentiment Model**: Run binary-sentiment-classification-using-roberta.ipynb to generate:
-
-        - *roberta_tokenizer folder*
-
-        - *best_model_state.bin*
-
-        Place these in Models/roberta_tokenizer/ and Models/sentiment_model/ respectively.
-
-
-## Run Locally
-
-**Run the Application**
+```bash
+git clone https://github.com/subhasishsaha/playstore-review-analyzer.git
+cd playstore-review-analyzer
 ```
+
+### Create a Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Linux/macOS:
+
+```bash
+source venv/bin/activate
+```
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+---
+
+## Models
+
+The repository contains the trained models required to run the application.
+
+If you wish to retrain the models:
+
+### Sentiment Model
+
+Run:
+
+```text
+binary-sentiment-classification-using-roberta.ipynb
+```
+
+Outputs:
+
+- best_model_state.bin
+- RoBERTa tokenizer files
+
+### Multi-Label Classifier
+
+Run:
+
+```text
+multi-label-classification-using-ensemble-approach.ipynb
+```
+
+Outputs:
+
+- ensemble_model.pkl
+- tfidf.pkl
+- multilabel_binarizer.pkl
+
+---
+
+## Running the Application
+
+```bash
 streamlit run app.py
 ```
+
+The application will launch in your browser automatically.
+
+---
+
 ## Methodology
-The project employs a multi-stage NLP pipeline:
 
-- **Data Labeling (Zero-Shot)**: The raw dataset was initially labeled using facebook/bart-large-mnli (Zero-Shot Classification) to create ground truth tags for specific app issues (See initial-multi-labelling-using-bart-large.ipynb).
+### 1. Dataset Preparation
 
-- **Multi-Label Classification**: A lightweight ensemble model (TF-IDF vectorization fed into Voting Classifier of Logistic Regression, XGBoost, and Random Forest) is used for real-time tag inference on the web app.
+The original review dataset was automatically labeled using:
 
-- **Sentiment Analysis**: A customized PyTorch architecture utilizing FacebookAI/roberta-base was fine-tuned to detect sentiment nuances in app reviews.
+- BART Large MNLI
+- Zero-Shot Classification
 
-- **Recommendation Engine**: Negative reviews are grouped by their predicted tags. These clusters are fed into Google Gemini-1.5-flash to generate summarized, technical suggestions for app developers.
+This created training labels for issue categories.
 
-**NOTE:** At the time of creating this, gemini 1.5 flash was available. You may need to change the Gemini Model to use the Recommendation Engine.
+### 2. Multi-Label Classification
+
+A TF-IDF representation is generated from review text and passed to an ensemble classifier composed of:
+
+- Logistic Regression
+- Random Forest
+- XGBoost
+
+### 3. Sentiment Analysis
+
+A fine-tuned RoBERTa model predicts review sentiment.
+
+### 4. Recommendation Generation
+
+Negative reviews are grouped by category and passed to Gemini for summarization and recommendation generation.
+
+---
 
 ## Usage
 
-- **Input App ID**: Find the package name in the Play Store URL (e.g., for WhatsApp, the ID is com.whatsapp).
+### Step 1
 
-- **Select Parameters**: Choose between "Newest" or "Most Relevant" and select the number of reviews to fetch.
+Enter a Google Play Store App ID.
 
-- **Analyze**: Click "Fetch & Analyze".
+Example:
 
-- **Explore**:
+```text
+com.whatsapp
+```
 
-    - View the raw dataframe with predicted labels.
+### Step 2
 
-    - Read AI-generated suggestions for fixing bugs/issues.
+Select:
 
-    - Navigate through the "Visualizations" dropdown to see charts.
-    
+- Review type
+- Number of reviews
 
+### Step 3
 
-## Contributing
+Click:
 
+```text
+Fetch & Analyze
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Step 4
 
+Explore:
+
+- Review table
+- Sentiment predictions
+- Category labels
+- Visual analytics
+- AI-generated recommendations
+
+---
+
+## Future Improvements
+
+- Neutral sentiment detection.
+- Multilingual review analysis.
+- Aspect-based sentiment analysis.
+- Real-time monitoring dashboard.
+- Trend detection across app versions.
+- Comparative analysis between competing apps.
+- Cloud deployment and automated model updates.
+
+---
+
+## Disclaimer
+
+This project is intended for educational and research purposes. Generated recommendations should be reviewed before being used for product or business decisions.
+
+---
+
+## License
+
+This project is released under the repository's LICENSE file.
