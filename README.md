@@ -17,6 +17,15 @@ The result is a dashboard that helps developers quickly identify recurring issue
 
 ---
 
+## Key Results
+
+- Achieved 92% classification accuracy (0.91 F1-score) on binary sentiment detection using a fine-tuned RoBERTa model with partial layer freezing.
+- Multi-label topic classification using an ensemble of Logistic Regression, Random Forest, and XGBoost on TF-IDF features, trained on labels generated via zero-shot classification with BART Large MNLI.
+- Automated product insight generation by integrating Google Gemini for cluster-level recommendation extraction from negative reviews, replacing manual analysis entirely.
+
+**Live Demo:** [Hugging Face Spaces](https://huggingface.co/spaces/ssaha007/playstore-review-analyzer)
+
+
 ## Key Features
 
 ### Review Collection
@@ -271,6 +280,8 @@ A TF-IDF representation is generated from review text and passed to an ensemble 
 - Logistic Regression
 - Random Forest
 - XGBoost
+
+The ensemble approach was chosen over a single classifier because no single model consistently outperformed across all eight issue categories — Logistic Regression handled sparse categories well while XGBoost captured non-linear patterns in denser ones. RoBERTa was used for sentiment rather than topic classification because sentiment is a semantic judgment that benefits from contextual embeddings, while topic classification on short reviews worked effectively with TF-IDF features at significantly lower inference cost.
 
 ### 3. Sentiment Analysis
 
